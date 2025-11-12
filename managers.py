@@ -4,10 +4,8 @@ import numpy as np
 import time
 
 class CaptureManager(object):
-    """
-    Gestiona la captura de video y el envío de cuadros a diferentes destinos.
-    Abstrae la clase VideoCapture de OpenCV.
-    """
+    #Gestiona la captura de video y el envío de cuadros a diferentes destinos.
+    #Abstrae la clase VideoCapture de OpenCV.
     def __init__(self, capture, should_mirror_preview=False):
         self._capture = capture
         self.should_mirror_preview = should_mirror_preview
@@ -21,13 +19,13 @@ class CaptureManager(object):
 
     @property
     def frame_size(self):
-        """Retorna el tamaño del cuadro (width, height)."""
+        #Retorna el tamaño del cuadro (width, height).
         width = int(self._capture.get(cv2.CAP_PROP_FRAME_WIDTH))
         height = int(self._capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
         return width, height
 
     def enterFrame(self):
-        """Captura el siguiente cuadro, si existe."""
+        #Captura el siguiente cuadro, si existe.
         assert not self._entered_frame, 'La enterFrame() anterior no tuvo una exitFrame() coincidente.'
         
         if self._capture is not None:
@@ -41,7 +39,7 @@ class CaptureManager(object):
         self._entered_frame = True
 
     def exitFrame(self):
-        """Muestra el cuadro y libera el recurso."""
+        #Muestra el cuadro y libera el recurso.
         if self.frame is None:
             self._entered_frame = False
             return
@@ -54,8 +52,7 @@ class CaptureManager(object):
             self._fps_estimate = self._frames_elapsed / time_elapsed
         self._frames_elapsed += 1
 
-        # Mostrar en la ventana (simulación, ya que la lógica de la ventana es externa en este diseño)
-        # Aquí es donde se podría aplicar el espejo si fuera necesario
+        # Mostrar en la ventana 
         if self.should_mirror_preview:
              self.frame = np.fliplr(self.frame).copy()
 
@@ -63,31 +60,24 @@ class CaptureManager(object):
         self.frame = None
 
 class WindowManager(object):
-    """
-    Gestiona la ventana de visualización y el manejo básico de eventos.
-    Abstrae las funciones de HighGUI de OpenCV.
-    """
+    
     def __init__(self, window_name, keypress_callback=None):
         self.window_name = window_name
         self.keypress_callback = keypress_callback
         self.is_window_created = False
 
     def createWindow(self):
-        """Crea la ventana."""
         cv2.namedWindow(self.window_name)
         self.is_window_created = True
 
     def show(self, frame):
-        """Muestra un cuadro en la ventana."""
         cv2.imshow(self.window_name, frame)
 
     def destroyWindow(self):
-        """Destruye la ventana."""
         cv2.destroyWindow(self.window_name)
         self.is_window_created = False
 
     def processEvents(self):
-        """Procesa eventos de teclado."""
         keycode = cv2.waitKey(1)
         if self.keypress_callback is not None and keycode != -1:
             # Descartar cualquier información no ASCII codificada
